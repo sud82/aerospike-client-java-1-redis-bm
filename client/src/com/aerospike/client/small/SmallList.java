@@ -14,7 +14,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.aerospike.client.large;
+package com.aerospike.client.small;
 
 import java.util.List;
 import java.util.Map;
@@ -28,8 +28,8 @@ import com.aerospike.client.policy.WritePolicy;
 /**
  * Create and manage a list within a single bin.
  */
-public final class LargeList {
-	private static final String PackageName = "llist";
+public final class SmallList {
+	private static final String PackageName = "slist";
 	
 	private final AerospikeClient client;
 	private final WritePolicy policy;
@@ -38,15 +38,15 @@ public final class LargeList {
 	private final Value userModule;
 	
 	/**
-	 * Initialize large list operator.
+	 * Initialize small list operator.
 	 * 
 	 * @param client				client
 	 * @param policy				generic configuration parameters, pass in null for defaults
 	 * @param key					unique record identifier
 	 * @param binName				bin name
-	 * @param userModule			Lua function name that initializes list configuration parameters, pass null for default list
+	 * @param userModule                            Lua function name that initializes list configuration parameters, pass null for default list
 	 */
-	public LargeList(AerospikeClient client, WritePolicy policy, Key key, String binName, String userModule) {
+	public SmallList(AerospikeClient client, WritePolicy policy, Key key, String binName, String userModule) {
 		this.client = client;
 		this.policy = policy;
 		this.key = key;
@@ -83,7 +83,7 @@ public final class LargeList {
 	 * 
 	 * @param values			values to add
 	 */
-	public final void ladd(List<?> values) throws AerospikeException {
+	public final void add(List<?> values) throws AerospikeException {
 		client.execute(policy, key, PackageName, "add_all", binName, Value.getAsList(values), userModule);
 	}
 

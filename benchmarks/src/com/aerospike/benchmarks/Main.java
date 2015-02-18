@@ -187,7 +187,7 @@ public class Main implements Log.Callback {
 			);
 
 		options.addOption("t", "storeType", true, 
-			"Defines data store type to run. Values:  KVS | LLIST | LSTACK | SLIST | SMAP" 
+			"Defines data store type to run. Values:  KVS | LLIST | LSTACK | SLIST | SMAP | SLIST_UDF | SMAP_UDF" 
 			);
 
 		options.addOption("BT", "batchThreads", true,
@@ -490,15 +490,36 @@ public class Main implements Log.Callback {
 
 		args.storeType = StorageType.KVS;
         if (line.hasOption("storeType")) {
-        	String storetype = line.getOptionValue("storeType");
+                String[] storeOpts = line.getOptionValue("storeType").split(",");
+        	String storetype = storeOpts[0];
+                int listMapSize = 3;
+
+                if(storetype.equals("SLIST") || storetype.equals("SMAP") || 
+                   storetype.equals("SLIST_UDF") || storetype.equals("SMAP_UDF")) {
+
+                   if(storeOpts.length > 1) {
+                       listMapSize = Integer.parseInt(storeOpts[1]);
+                       System.out.println("&&&&&&&&\n&&&&&&&&&listsize: " + listMapSize);
+                   }
+                
+                }
+
 			if (storetype.equals("LLIST")) {
 				args.storeType = StorageType.LLIST;
 			} else if (storetype.equals("LSTACK")) {
 				args.storeType = StorageType.LSTACK;
 			} else if (storetype.equals("SLIST")) {
-                                args.storeType = StorageType.SLIST;                   
+                                args.storeType = StorageType.SLIST; 
+                                args.storeSize = listMapSize;
                         } else if (storetype.equals("SMAP")) {
                                 args.storeType = StorageType.SMAP;
+                                args.storeSize = listMapSize;
+                        } else if (storetype.equals("SLIST_UDF")) {
+                                args.storeType = StorageType.SLIST_UDF;
+                                args.storeSize = listMapSize;
+                        } else if (storetype.equals("SMAP_UDF")) {
+                                args.storeType = StorageType.SMAP_UDF;
+                                args.storeSize = listMapSize;
                         }
                         
         }
@@ -664,13 +685,11 @@ public class Main implements Log.Callback {
 			AerospikeClient client = new AerospikeClient(clientPolicy, hosts[0], port);
 			try {
 				if (initialize) {
-                                    System.out.println("******************Changed doinsert*************");
                                     
                                     doInserts(client, null);
                                    
 				} 
 				else {
-                                    System.out.println("******************Changed rwtest*************");
                                     
                                     doRWTest(client);
 

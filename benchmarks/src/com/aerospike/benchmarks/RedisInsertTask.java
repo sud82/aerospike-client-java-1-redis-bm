@@ -78,7 +78,7 @@ public class RedisInsertTask implements Runnable {
                             break;
 
                         case SLIST:
-                            int listSize = 3;
+                            int listSize = args.storeSize;
 
                             if (counters.write.latency != null) {
                                 long begin = System.currentTimeMillis();
@@ -98,7 +98,7 @@ public class RedisInsertTask implements Runnable {
 
                             break;
                         case SMAP:
-                            int mapSize = 3;
+                            int mapSize = args.storeSize;
                              
                             HashMap<String, String> map = new HashMap<String,String>();
                             for(int j = 0; j < mapSize; j++) {
@@ -106,17 +106,15 @@ public class RedisInsertTask implements Runnable {
                             }
                             if (counters.write.latency != null) {
                                 long begin = System.currentTimeMillis();
-                                for (int j = 0; j < mapSize; j++) {
-                                    shardedJedisClient.hmset(strKey,map);
-                                }
+                                shardedJedisClient.hmset(strKey,map);
+                                
                                 long elapsed = System.currentTimeMillis() - begin;
                                 counters.write.count.getAndIncrement();			
                                 counters.write.latency.add(elapsed);
                             }
                             else {
-                                for(int k =0; k < mapSize; k++) {
-                                    shardedJedisClient.hmset(strKey, map);
-                                }
+                                shardedJedisClient.hmset(strKey, map);
+                                
                                 counters.write.count.getAndIncrement();			
                             }
                             break;

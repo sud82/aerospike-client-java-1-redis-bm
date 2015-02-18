@@ -101,9 +101,8 @@ public final class InsertTaskSync extends InsertTask {
 		LargeStack lstack = client.getLargeStack(args.writePolicy, key, "stackltracker", null);
 		lstack.push(Value.getAsMap(entry));
 	}
-        protected void smallListAdd(Key key, Value value) throws AerospikeException {
+        protected void smallListAdd(Key key, Value value, int itemsInList) throws AerospikeException {
                 ArrayList<Object> Slist = null;
-                int itemsInList = 3;
             		// If an error occurred, yield thread to back off throttle.
 		// Fail counters are reset every second.
 		if (counters.write.timeouts.get() > 0) {
@@ -111,6 +110,7 @@ public final class InsertTaskSync extends InsertTask {
 		}
 		Slist = new ArrayList<Object>();
 		for(int i = 0; i < itemsInList; i++) {
+                    
 			Slist.add(value);
 		}
 		Bin listBin = Bin.asList("binTest", Slist);
@@ -129,10 +129,13 @@ public final class InsertTaskSync extends InsertTask {
 		}
             
         }
-        protected void smallMapAdd(Key key, Value value) throws AerospikeException{
+        
+            
+        
+        protected void smallMapAdd(Key key, Value value, int mapSize) throws AerospikeException{
                             ArrayList<Object> Slist = null;
-                int mapSize = 3;
-            		// If an error occurred, yield thread to back off throttle.
+
+                            // If an error occurred, yield thread to back off throttle.
 		// Fail counters are reset every second.
 		if (counters.write.timeouts.get() > 0) {
 			Thread.yield();
@@ -156,4 +159,6 @@ public final class InsertTaskSync extends InsertTask {
 
 		}
         }
+        
+
 }

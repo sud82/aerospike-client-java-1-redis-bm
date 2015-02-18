@@ -270,16 +270,17 @@ public class RedisRWTask implements Runnable {
     protected void doWriteSList(ShardedJedis shardedJedisClient, int keyIdx) {
 	String strKey = "" + (keyStart + keyIdx);
 	Bin[] bins = args.getBins(random, true);
-	String strValue = bins[0].value.toString();        
+	String strValue = bins[0].value.toString();
+        int index =0;
         try {
 	    if (counters.write.latency != null) {
 		long begin = System.currentTimeMillis();
-		shardedJedisClient.lpush(strKey, strValue);
+		shardedJedisClient.lset(strKey, index, strValue);
 		long elapsed = System.currentTimeMillis() - begin;
 		counters.write.count.getAndIncrement();
 		counters.write.latency.add(elapsed);
 	    } else {
-		shardedJedisClient.lpush(strKey, strValue);
+		shardedJedisClient.lset(strKey, index, strValue);
 		counters.write.count.getAndIncrement();
 	    }            
         
@@ -294,7 +295,7 @@ public class RedisRWTask implements Runnable {
 	String strKey = "" + (keyStart + keyIdx);
 	Bin[] bins = args.getBins(random, true);
 	String strValue = bins[0].value.toString();
-        String mapField = "mapField";
+        String mapField = "1";
         try {
 	    if (counters.write.latency != null) {
 		long begin = System.currentTimeMillis();

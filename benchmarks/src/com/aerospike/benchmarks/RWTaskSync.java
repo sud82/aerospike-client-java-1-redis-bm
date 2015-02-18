@@ -24,6 +24,8 @@ import com.aerospike.client.Record;
 import com.aerospike.client.Value;
 import com.aerospike.client.large.LargeList;
 import com.aerospike.client.large.LargeStack;
+import com.aerospike.client.policy.WritePolicy;
+import static java.lang.System.console;
 
 import java.util.List;
 import java.util.Map;
@@ -213,30 +215,86 @@ public class RWTaskSync extends RWTask {
                
 	}
         
+        /*
         @Override
         protected  void smallListAdd(Key key, Value value) throws AerospikeException{
                 String binName = "binTest";
 
-                ArrayList<Value> list = new ArrayList<Value>();
+		if (counters.write.latency != null) {
+                        long begin = System.currentTimeMillis();
+                        Bin bin =  new Bin(binName, "SumitJi123");
+                         //bin = new Bin(binName, " World");
+                        //console.info("Append \"" + bin.value + "\" to existing record.");
+                        client.append(args.writePolicy, key, bin);                        
 
+			long elapsed = System.currentTimeMillis() - begin;
+			counters.write.latency.add(elapsed);
+			counters.write.count.getAndIncrement();		
+                        
+
+		} else {
+                        Bin bin =  new Bin(binName, "SumitJi123");
+                         //bin = new Bin(binName, " World");
+                        //console.info("Append \"" + bin.value + "\" to existing record.");
+                        client.append(args.writePolicy, key, bin);
+			counters.write.count.getAndIncrement();		
+
+                } 
+                
+
+        }*/
+        /* function added for bypassing lua */
+
+        
+        protected  void smallListAdd(Key key, Value value) throws AerospikeException{
+                String binName = "binTest";
+
+                ArrayList<Value> list = new ArrayList<Value>();
 		if (counters.write.latency != null) {
                         long begin = System.currentTimeMillis();
                         Record record = client.get(args.writePolicy, key, binName);
                         list = (ArrayList<Value>) record.getValue(binName);
-                        list.add(value);
                         Bin bin = Bin.asList(binName, list);
                         client.put(args.writePolicy, key, bin);
 
 			long elapsed = System.currentTimeMillis() - begin;
 			counters.write.latency.add(elapsed);
+
 		} else {
                         Record record = client.get(args.writePolicy, key, binName);
                         list = (ArrayList<Value>)record.getValue(binName);
-                        list.add(value);
                         Bin bin = Bin.asList(binName, list);
                         client.put(args.writePolicy, key, bin);
+
+                } 
+                
+                if ((list == null || list.size() == 0) && args.reportNotFound) {
+			counters.readNotFound.getAndIncrement();	
+		} else {
+			counters.write.count.getAndIncrement();		
+		}
+
+        }
+        
+        @Override
+        protected  void smallListAddUDF(Key key, Value value) throws AerospikeException{
+                String binName = "binTest";
+                String packageName = "sud";
+
+                int index =1;
+
+		if (counters.write.latency != null) {
+                        long begin = System.currentTimeMillis();
+                        client.lset(args.writePolicy, key, value, index, binName, packageName);
+			long elapsed = System.currentTimeMillis() - begin;
+			counters.write.latency.add(elapsed);
+                        counters.write.count.getAndIncrement();			
+
+		} else {
+                        client.lset(args.writePolicy, key, value, index, binName, packageName);
+                        counters.write.count.getAndIncrement();			
+
                 }
-                counters.write.count.getAndIncrement();			
 
         }
         
@@ -254,16 +312,47 @@ public class RWTaskSync extends RWTask {
                         Record record = client.get(args.writePolicy, key, binName);
                         list = (ArrayList<Value>)record.getValue(binName);
 
-                }
-                counters.read.count.getAndIncrement();	
+                } 
+                
+                if ((list == null || list.size() == 0) && args.reportNotFound) {
+			counters.readNotFound.getAndIncrement();	
+		}
+		else {
+			counters.read.count.getAndIncrement();		
+		}	
         
         }
+        
+        @Override
+        protected  void smallListGetUDF(Key key) throws AerospikeException{
+                String binName = "binTest";
+                int index = 1;
+                String packageName = "sud";
+                String result;
+		if (counters.read.latency != null) {
+                    	long begin = System.currentTimeMillis();
+                        result = client.lindex(args.writePolicy, key, index, binName, packageName);
+			long elapsed = System.currentTimeMillis() - begin;                        
+			counters.read.latency.add(elapsed);
+		} else {
 
+                        result = client.lindex(args.writePolicy, key, index, binName, packageName);
+
+                } 
+                
+                if ((result == null || result.isEmpty()) && args.reportNotFound) {
+			counters.readNotFound.getAndIncrement();	
+		}
+		else {
+			counters.read.count.getAndIncrement();		
+		}	
+        
+        }
                 
         @Override
         protected  void smallMapAdd(Key key, Value value) throws AerospikeException{
                 String binName = "binTest";
-                String mapKey = "key1";
+                String mapKey = "1";
                 HashMap<String, Value> map = new HashMap<String, Value>();
                 if(counters.write.latency != null) {
                     long begin = System.currentTimeMillis();
@@ -274,15 +363,40 @@ public class RWTaskSync extends RWTask {
                     client.put(args.writePolicy, key, bin);
                     long elapsed = System.currentTimeMillis() - begin;
                     counters.write.latency.add(elapsed);
+
                 } else {
                     Record record = client.get(args.writePolicy, key, binName);
                     map = (HashMap<String, Value>)record.getValue(binName);
                     map.put(mapKey, value);
                     Bin bin = Bin.asMap(binName, map);
-                    client.put(args.writePolicy, key, bin);                    
+                    client.put(args.writePolicy, key, bin);
+                }
+                if ((map == null || map.size() == 0) && args.reportNotFound) {
+			counters.readNotFound.getAndIncrement();	
+		} else {
+			counters.write.count.getAndIncrement();		
+		}
+        }
+        
+        @Override
+        protected  void smallMapAddUDF(Key key, Value value) throws AerospikeException{
+                String binName = "binTest";
+                String mapField = "1";
+                String packageName = "sud";
+                if(counters.write.latency != null) {
+                    long begin = System.currentTimeMillis();
+                    client.hset(args.writePolicy, key, mapField, value, binName, packageName);
+                    long elapsed = System.currentTimeMillis() - begin;
+                    counters.write.latency.add(elapsed);
+                    counters.write.count.getAndIncrement();			
+
+                } else {
+                    client.hset(args.writePolicy, key, mapField, value, binName, packageName);
+                    counters.write.count.getAndIncrement();			
+
 
                 }
-                
+        
         
         }
         
@@ -290,16 +404,52 @@ public class RWTaskSync extends RWTask {
         protected  void smallMapGet(Key key) throws AerospikeException{
                 String binName = "binTest";
                 HashMap<String, Value> map = new HashMap<String, Value>();
-                if(counters.write.latency != null) {
+                if(counters.read.latency != null) {
                     long begin = System.currentTimeMillis();
                     Record record = client.get(args.writePolicy, key, binName);
                     map = (HashMap<String, Value>)record.getValue(binName);
                     long elapsed = System.currentTimeMillis() - begin;
-                    counters.write.latency.add(elapsed);
+                    counters.read.latency.add(elapsed);
                 } else {
                     Record record = client.get(args.writePolicy, key, binName);
                     map = (HashMap<String, Value>)record.getValue(binName);
 
-                }        
+                } 
+                
+                if ((map == null || map.size() == 0) && args.reportNotFound) {
+			counters.readNotFound.getAndIncrement();	
+		}
+		else {
+			counters.read.count.getAndIncrement();		
+		}
+                	
+
         }
+
+        @Override
+        protected  void smallMapGetUDF(Key key) throws AerospikeException{
+                String binName = "binTest";
+                String mapField = "1";
+                String packageName = "sud";
+                String result;
+                
+                if(counters.read.latency != null) {
+                    long begin = System.currentTimeMillis();
+                    result = client.hget(args.writePolicy, key, mapField, binName, packageName);
+                    long elapsed = System.currentTimeMillis() - begin;
+                    counters.read.latency.add(elapsed);
+                } else {
+                    result = client.hget(args.writePolicy, key, mapField, binName, packageName);
+
+                } 
+                
+                if ((result == null || result.isEmpty()) && args.reportNotFound) {
+			counters.readNotFound.getAndIncrement();	
+		}
+		else {
+			counters.read.count.getAndIncrement();		
+		}
+                	
+
+        }        
 }

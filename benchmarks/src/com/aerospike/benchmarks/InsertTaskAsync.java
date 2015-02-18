@@ -83,10 +83,10 @@ public final class InsertTaskAsync extends InsertTask implements WriteListener {
 	protected void largeStackPush(Key key, Value value) throws AerospikeException {
 	}
         
-        protected void smallListAdd(Key key, Value value) throws AerospikeException {
+        protected void smallListAdd(Key key, Value value, int listSize) throws AerospikeException {
         }
         
-        protected void smallMapAdd(Key key, Value value) throws AerospikeException {
+        protected void smallMapAdd(Key key, Value value, int mapSize) throws AerospikeException {
         }
 
 }

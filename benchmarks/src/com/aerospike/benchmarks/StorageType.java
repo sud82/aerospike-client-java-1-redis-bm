@@ -41,7 +41,17 @@ public enum StorageType {
         SLIST,
         
         /**
+         * SLIST simple List for add and get with UDF 
+         */
+        SLIST_UDF,
+        
+        /**
          * SMAP simple map for add(key: value) and get 
          */
-        SMAP
+        SMAP,
+        
+        /**
+         * SMAP simple map for add(key: value) and get with UDF 
+         */
+        SMAP_UDF       
 }

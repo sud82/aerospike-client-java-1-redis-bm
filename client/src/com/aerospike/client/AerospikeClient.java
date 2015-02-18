@@ -552,6 +552,7 @@ public class AerospikeClient implements Closeable {
 	 * @return						array of records
 	 * @throws AerospikeException	if read fails
 	 */
+        
 	public final Record[] get(BatchPolicy policy, Key[] keys) throws AerospikeException {
 		if (policy == null) {
 			policy = batchPolicyDefault;
@@ -803,6 +804,10 @@ public class AerospikeClient implements Closeable {
 	public final LargeList getLargeList(WritePolicy policy, Key key, String binName, String userModule) {
 		return new LargeList(this, policy, key, binName, userModule);
 	}
+        
+        
+
+        
 
 	/**
 	 * Initialize large map operator.  This operator can be used to create and manage a map 
@@ -1006,6 +1011,7 @@ public class AerospikeClient implements Closeable {
 		WritePolicy writePolicy = (policy == null)? writePolicyDefault : new WritePolicy(policy);
 		return execute(writePolicy, key, packageName, functionName, args);
 	}
+       
 	
 	/**
 	 * Execute user defined function on server and return results.
@@ -1029,9 +1035,9 @@ public class AerospikeClient implements Closeable {
 		if (policy == null) {
 			policy = writePolicyDefault;
 		}
+
 		ExecuteCommand command = new ExecuteCommand(cluster, policy, key, packageName, functionName, args);
-		command.execute();
-		
+                command.execute();
 		Record record = command.getRecord();
 		
 		if (record == null || record.bins == null) {
@@ -1057,6 +1063,7 @@ public class AerospikeClient implements Closeable {
 			throw new AerospikeException(obj.toString());
 		}
 		throw new AerospikeException("Invalid UDF return value");
+                
 	}
 
 	//----------------------------------------------------------
@@ -1472,4 +1479,35 @@ public class AerospikeClient implements Closeable {
 		}
 		return info.getValue();
 	}
+        
+        public final String lindex(WritePolicy policy, Key key, int index, String binName, String PackageName) throws AerospikeException {
+            Value bin = Value.get(binName);
+            Value ind = Value.get(index);
+            Object result = execute(policy, key, PackageName, "LINDEX", bin, ind);
+            return result.toString();
+            
+        }
+        
+        public final void lset(WritePolicy policy, Key key, Value value, int index, String binName, String PackageName) throws AerospikeException {
+            Value bin = Value.get(binName);
+            Value ind = Value.get(index);
+            //System.out.println("binname "+binName + " key " + key + "value" + val.toString() +"index " + index);
+            execute(policy, key, PackageName, "LSET", bin, ind, value);
+    
+        }
+        public final void hset(WritePolicy policy, Key key, String field, Value value, String binName , String PackageName) throws AerospikeException {
+            Value bin = Value.get(binName);
+            Value fie = Value.get(field);
+            execute(policy, key, PackageName, "HSET", bin,  fie, value);
+            
+        }
+        
+        public final String hget(WritePolicy policy, Key key, String field, String binName, String PackageName) throws AerospikeException {
+            Value bin = Value.get(binName);
+            Value fie = Value.get(field);
+            Object result = execute(policy, key, PackageName, "HGET", bin, fie);
+            return result.toString();
+        }
+        
+
 }

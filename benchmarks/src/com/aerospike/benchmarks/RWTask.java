@@ -262,6 +262,15 @@ public abstract class RWTask implements Runnable {
 				largeStackPush(key, bins[0].value);
 				break;
                             
+                        case SLIST_UDF:
+                                smallListAddUDF(key, bins[0].value);
+                                break;
+                            
+                        case SMAP_UDF:
+                            
+                                smallMapAddUDF(key, bins[0].value);
+                                break;
+                            
                         case SLIST:
                                 smallListAdd(key, bins[0].value);
                                 break;
@@ -270,7 +279,8 @@ public abstract class RWTask implements Runnable {
                             
                                 smallMapAdd(key, bins[0].value);
                                 break;
-			}
+                            
+                        }
                  
 			
 			if (args.validate) {
@@ -336,7 +346,15 @@ public abstract class RWTask implements Runnable {
                                 case SMAP:
                                         smallMapGet(key);
                                         break;
-				}
+                                    
+                                case SLIST_UDF:
+                                        smallListGetUDF(key);
+                                        break;
+                                    
+                                case SMAP_UDF:
+                                        smallMapGetUDF(key);
+                                        break;
+                                }
 			} 
 			else {
 				switch (args.storeType) {
@@ -353,14 +371,22 @@ public abstract class RWTask implements Runnable {
 					largeStackPeek(key);
 					break;
                                     
+                                case SLIST_UDF:
+                                        smallListGetUDF(key);
+                                        break;
+                                    
+                                case SMAP_UDF:
+                                        smallMapGetUDF(key);
+                                        break; 
+                                    
                                 case SLIST:
                                         smallListGet(key);
                                         break;
                                     
                                 case SMAP:
                                         smallMapGet(key);
-                                        break;                                    
-				}
+                                        break;
+                                }
 			}
 		}
 		catch (AerospikeException ae) {
@@ -531,10 +557,18 @@ public abstract class RWTask implements Runnable {
 	protected abstract void largeStackPeek(Key key) throws AerospikeException;
                 
         protected abstract void smallListAdd(Key key, Value value) throws AerospikeException;
+        protected abstract void smallListAddUDF(Key key, Value value) throws AerospikeException;
+
         protected abstract void smallListGet(Key key) throws AerospikeException;
+        protected abstract void smallListGetUDF(Key key) throws AerospikeException;
+
 
                 
         protected abstract void smallMapAdd(Key key, Value value) throws AerospikeException;
+        protected abstract void smallMapAddUDF(Key key, Value value) throws AerospikeException;
+
         protected abstract void smallMapGet(Key key) throws AerospikeException;
+        protected abstract void smallMapGetUDF(Key key) throws AerospikeException;
+
 
 }

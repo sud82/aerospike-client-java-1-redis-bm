@@ -271,15 +271,26 @@ public class RWTaskAsync extends RWTask {
         protected  void smallListAdd(Key key, Value value) throws AerospikeException{
         }
         
+        protected  void smallListAddUDF(Key key, Value value) throws AerospikeException{
+        }
+        
         protected  void smallListGet(Key key) throws AerospikeException{
+        }
+        
+        protected  void smallListGetUDF(Key key) throws AerospikeException{
         }
                 
         protected  void smallMapAdd(Key key, Value value) throws AerospikeException{
         }
         
+        protected  void smallMapAddUDF(Key key, Value value) throws AerospikeException{
+        }
+        
         protected  void smallMapGet(Key key) throws AerospikeException{
         }
 
+        protected  void smallMapGetUDF(Key key) throws AerospikeException{
+        }
 	/*
 	private final class ValidateHandler implements RecordListener {
 		

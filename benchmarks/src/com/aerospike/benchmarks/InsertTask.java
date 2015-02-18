@@ -60,12 +60,20 @@ public abstract class InsertTask implements Runnable {
 						largeStackPush(key, bins[0].value);
 						break;
                                         case SLIST:
-                                                smallListAdd(key, bins[0].value);
+                                                smallListAdd(key, bins[0].value, args.storeSize);
                                                 break;
                                             
                                         case SMAP:
-                                                smallMapAdd(key, bins[0].value);
+                                                smallMapAdd(key, bins[0].value, args.storeSize);
                                                 break;
+                                            
+                                        case SLIST_UDF:
+                                                smallListAdd(key, bins[0].value, args.storeSize);
+                                                break;
+                                            
+                                        case SMAP_UDF:
+                                                smallMapAdd(key, bins[0].value, args.storeSize);
+                                                break;                                            
                                         }
 				}
 				catch (AerospikeException ae) {
@@ -106,6 +114,6 @@ public abstract class InsertTask implements Runnable {
 	protected abstract void put(Key key, Bin[] bins) throws AerospikeException;
 	protected abstract void largeListAdd(Key key, Value value) throws AerospikeException;
 	protected abstract void largeStackPush(Key key, Value value) throws AerospikeException;
-        protected abstract void smallListAdd(Key key, Value value) throws AerospikeException;
-        protected abstract void smallMapAdd(Key key, Value value) throws AerospikeException;
+        protected abstract void smallListAdd(Key key, Value value, int listSize) throws AerospikeException;
+        protected abstract void smallMapAdd(Key key, Value value, int mapSize) throws AerospikeException;
 }
