@@ -215,7 +215,7 @@ public class RWTaskSync extends RWTask {
                
 	}
         
-        /*
+        
         @Override
         protected  void smallListAdd(Key key, Value value) throws AerospikeException{
                 String binName = "binTest";
@@ -242,10 +242,10 @@ public class RWTaskSync extends RWTask {
                 } 
                 
 
-        }*/
+        }
         /* function added for bypassing lua */
 
-        
+        /*
         protected  void smallListAdd(Key key, Value value) throws AerospikeException{
                 String binName = "binTest";
 
@@ -275,7 +275,7 @@ public class RWTaskSync extends RWTask {
 		}
 
         }
-        
+        */
         @Override
         protected  void smallListAddUDF(Key key, Value value) throws AerospikeException{
                 String binName = "binTest";
